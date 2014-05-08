@@ -1,6 +1,6 @@
 # SuperSerial
 
-TODO: Write a gem description
+[![Build Status](https://travis-ci.org/bbean86/super_serial.svg?branch=master)](https://travis-ci.org/bbean86/super_serial)
 
 ## Installation
 
