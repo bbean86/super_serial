@@ -28,7 +28,7 @@ class SuperHero < ActiveRecord::Base
 end
 ```
 
-The first parameter supplied dictates the column the serialized data will be stored in. The remaining key-value pairs indicate the name and default value of the data you want to serialize. Underneath the hood, it serializes an OpenStruct in the features column on SuperHero. It then defines accessor methods for each key-value pair, or "entry". 
+The first parameter supplied dictates the column the serialized data will be stored in. The remaining key-value pairs indicate the name and default value of the data you want to serialize. Under the hood, it serializes an OpenStruct in the features column on SuperHero. It then defines accessor methods for each key-value pair, or "entry". 
 
 ``` 
 superman = SuperHero.create 
