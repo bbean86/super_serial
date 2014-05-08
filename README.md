@@ -1,7 +1,7 @@
 # SuperSerial
 
 [![Build Status](https://travis-ci.org/bbean86/super_serial.svg?branch=master)](https://travis-ci.org/bbean86/super_serial)
-
+[![Code Climate](https://codeclimate.com/github/bbean86/super_serial.png)](https://codeclimate.com/github/bbean86/super_serial)
 ## Installation
 
 Add this line to your application's Gemfile:
