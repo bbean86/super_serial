@@ -1,7 +1,7 @@
 require 'active_support'
 require "super_serial/version"
 require 'super_serial/super_serialize'
-require 'super_serial/value_validator'
+require 'super_serial/value_type_validator'
 require 'super_serial/value_converter'
 
 module SuperSerial

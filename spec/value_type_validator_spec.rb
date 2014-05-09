@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe SuperSerial::ValueValidator do
+describe SuperSerial::ValueTypeValidator do
   before :each do
     @default_boolean = false
     @default_float   = 2.0
@@ -13,29 +13,29 @@ describe SuperSerial::ValueValidator do
 
   it 'does not allow a value of a different type to be stored' do
     @instance.int_entry = 'This is not an integer'
-    SuperSerial::ValueValidator.validate({ int_entry: @default_int }, @instance).should eql(false)
+    SuperSerial::ValueTypeValidator.validate({ int_entry: @default_int }, @instance).should eql(false)
   end
 
   it 'allows boolean values to be changed' do
     @instance.boolean_entry = true
-    SuperSerial::ValueValidator.validate({ boolean_entry: @default_boolean }, @instance).should eql(true)
+    SuperSerial::ValueTypeValidator.validate({ boolean_entry: @default_boolean }, @instance).should eql(true)
     @instance.boolean_entry.should eql(true)
   end
 
   it 'adds errors to the instance of the class using SuperSerial' do
     @instance.int_entry = 'This is not an integer'
-    SuperSerial::ValueValidator.validate({ int_entry: @default_int }, @instance)
+    SuperSerial::ValueTypeValidator.validate({ int_entry: @default_int }, @instance)
     @instance.errors.full_messages.size.should eql(1)
   end
 
   it 'does not validate nil default values' do
     @instance.nil_entry = 'I can set this to anything'
-    SuperSerial::ValueValidator.validate({ nil_entry: nil }, @instance).should eql(true)
+    SuperSerial::ValueTypeValidator.validate({ nil_entry: nil }, @instance).should eql(true)
     @instance.nil_entry = :yes_you_can
-    SuperSerial::ValueValidator.validate({ nil_entry: nil }, @instance).should eql(true)
+    SuperSerial::ValueTypeValidator.validate({ nil_entry: nil }, @instance).should eql(true)
     @instance.nil_entry = true
-    SuperSerial::ValueValidator.validate({ nil_entry: nil }, @instance).should eql(true)
+    SuperSerial::ValueTypeValidator.validate({ nil_entry: nil }, @instance).should eql(true)
     @instance.nil_entry = 5
-    SuperSerial::ValueValidator.validate({ nil_entry: nil }, @instance).should eql(true)
+    SuperSerial::ValueTypeValidator.validate({ nil_entry: nil }, @instance).should eql(true)
   end
 end

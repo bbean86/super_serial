@@ -86,7 +86,7 @@ module SuperSerial #like, for srs
     end
 
     def check_serialized_data_type(entry)
-      ValueValidator.validate(entry, self) if entry_is_serialized?(entry.keys.first)
+      ValueTypeValidator.validate(entry, self) if entry_is_serialized?(entry.keys.first)
     end
 
     def entry_is_serialized?(entry_name)
