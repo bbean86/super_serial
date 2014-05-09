@@ -6,14 +6,13 @@ module SuperSerial #like, for srs
     # the serialized data in. From the hash argument, it will define getters and setters for each symbol
     # or key from the with_defaults hash you pass to it. It handles adding each entry to attr_accessible, which
     # means you will be able to access values from your serialized column like any other ActiveRecord attr_accessible.
-    # This is handy for forms, especially.
     #
-    # HANDLING DEFAULTS
+    # +defaults+
     #
     # This method will set default return values for any entries defined. If the default is a boolean value, it will
     # define a getter instance method ending in ?. Note that once a default is set, the type cannot be changed.
     #
-    # USAGE EXAMPLES
+    # +usage+
     #
     # class AwesomeClass < ActiveRecord::Base
     #   include SuperSerial

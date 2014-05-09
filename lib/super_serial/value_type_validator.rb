@@ -20,8 +20,7 @@ module SuperSerial
 
       private
         def value_type_valid?(default_value_class, value, conversion_method)
-          value_class_name = get_friendly_class_name(value.class.name)
-          value_class_name == default_value_class || ValueConverter.convertible?(value, default_value_class.downcase.to_sym, conversion_method)
+          get_friendly_class_name(value.class.name) == default_value_class || ValueConverter.convertible?(value, default_value_class.downcase.to_sym, conversion_method)
         end
 
         def get_friendly_class_name(class_name)
