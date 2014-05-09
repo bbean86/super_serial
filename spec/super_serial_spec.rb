@@ -1,16 +1,6 @@
 require 'spec_helper'
 
 describe SuperSerial do
-  before :all do
-    @klass = Temping.create :class_to_super_serialize do
-      include SuperSerial
-
-      with_columns do |t|
-        t.text :foo_column
-      end
-    end
-  end
-
   it 'cannot be included in non AR classes' do
     expect {
       class NonActiveRecord
@@ -19,26 +9,33 @@ describe SuperSerial do
     }.to raise_exception(Exception)
   end
 
+  it 'handles updates to the invocation of .super_serialize' do
+    ClassToSuperSerialize.super_serialize :foo_column, foo_attribute: 'DEFAULT'
+    expect { ClassToSuperSerialize.create }.not_to raise_exception(Exception)
+    ClassToSuperSerialize.super_serialize :foo_column, bar_attribute: true
+    expect { ClassToSuperSerialize.create }.not_to raise_exception(Exception)
+  end
+
   context '.super_serialize' do
     it 'serializes the data given in the column given by the first argument' do
-      @klass.should_receive(:serialize).with(:foo_column, OpenStruct)
-      @klass.super_serialize :foo_column, name: 'Billy'
+      ClassToSuperSerialize.should_receive(:serialize).with(:foo_column, OpenStruct)
+      ClassToSuperSerialize.super_serialize :foo_column, name: 'Billy'
     end
 
     context 'with appropriate args' do
       before :each do
-        @klass.super_serialize :foo_column, name: 'Billy', male: true, height: 70, bar_attribute: nil
+        ClassToSuperSerialize.super_serialize :foo_column, name: 'Billy', male: true, height: 70, bar_attribute: nil
       end
 
       it "adds the given attributes to the class's attr_accessible array" do
         [:name, :male, :height, :bar_attribute].each do |entry|
-          @klass.accessible_attributes.include?(entry).should eql(true)
+          ClassToSuperSerialize.accessible_attributes.include?(entry).should eql(true)
         end
       end
 
       context 'an instance of the class calling .super_serialize' do
         before :each do
-          @instance = @klass.new
+          @instance = ClassToSuperSerialize.new
         end
 
         it 'responds to instance methods ending in ? for each entry given with a boolean default' do
@@ -59,7 +56,7 @@ describe SuperSerial do
 
         context 'that is a new record' do
           before :each do
-            @instance.save unless @instance.persisted?
+            @instance.save!
           end
 
           it 'sets the default values for the entries given' do
@@ -68,75 +65,23 @@ describe SuperSerial do
             end
           end
         end
-
-        context 'column validations' do
-          before :each do
-            @instance = @klass.create
-          end
-
-          it 'does not allow a value of a different type to be stored' do
-            @instance.name = 3
-            @instance.save.should eql(false)
-            @instance.errors.full_messages.first.should eql('name can only be stored as a string')
-          end
-
-          it 'allows boolean values to be changed' do
-            @instance.male = false
-            @instance.save.should eql(true)
-            @instance.errors.empty?.should eql(true)
-          end
-
-          it 'does not validate nil default values' do
-            @instance.bar_attribute = false
-            @instance.save.should eql(true)
-            @instance.errors.empty?.should eql(true)
-            @instance.bar_attribute = 'foo'
-            @instance.save.should eql(true)
-            @instance.errors.empty?.should eql(true)
-            @instance.bar_attribute = 3
-            @instance.save.should eql(true)
-            @instance.errors.empty?.should eql(true)
-          end
-          
-          context 'automatic type conversions' do
-            it 'convert a given value to the correct type if possible' do
-              @instance.height = '65'
-              @instance.save.should eql(true)
-              @instance.height.should eql(65)
-            end
-
-            context 'boolean conversions' do
-              it 'convert 1 to true' do
-                @instance.male = 1
-                @instance.save.should eql(true)
-                @instance.male.should eql(true)
-              end
-
-              it "convert '1' to true" do
-                @instance.male = '1'
-                @instance.save.should eql(true)
-                @instance.male.should eql(true)
-              end
-
-              it "convert 'true' to true" do
-                @instance.male = 'true'
-                @instance.save.should eql(true)
-                @instance.male.should eql(true)
-              end
-
-              it 'convert anything else to false' do
-                @instance.male = 'OMGHAX'
-                @instance.save.should eql(true)
-                @instance.male.should eql(false)
-                @instance = @klass.create
-                @instance.male = 'false'
-                @instance.save.should eql(true)
-                @instance.male.should eql(false)
-              end
-            end
-          end
-        end
       end
+    end
+  end
+
+  context '#set_entry_value' do
+    before :each do
+      ClassToSuperSerialize.super_serialize :foo_column, name: 'Billy', male: true, height: 70, bar_attribute: nil
+      @instance = ClassToSuperSerialize.create
+    end
+
+    it 'returns a boolean' do
+      @instance.set_entry_value('Nick Fury', :name).should eql(true)
+    end
+
+    it 'sets the entry to the value given' do
+      @instance.set_entry_value('Bruce Banner', :name)
+      @instance.name.should eql('Bruce Banner')
     end
   end
 end

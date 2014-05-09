@@ -1,6 +1,6 @@
 module SuperSerial #like, for srs
   module ClassMethods
-    attr_accessor :column_name
+    attr_accessor :super_serial_column_name, :serialized_entry_names
 
     # Use this method if you need a more robust serialized column. The first argument is the column to store
     # the serialized data in. From the hash argument, it will define getters and setters for each symbol
@@ -21,14 +21,14 @@ module SuperSerial #like, for srs
     # end
 
     def super_serialize(_column_name, *entries)
-      self.column_name = _column_name.to_s
+      self.super_serial_column_name = _column_name.to_s
+      self.serialized_entry_names   = entries.map { |entry| entry.keys }.flatten
       # raise Exception.new("#{ self.name } does not have a #{ column_name } column") unless self.column_names.include?(column_name)
 
       # please remove the line below and uncomment the exception above once the VenueSettings migration has been run
-      return unless self.column_names.include?(column_name)
+      return unless self.column_names.include?(super_serial_column_name)
 
-      serialize column_name.to_sym, OpenStruct
-      attr_accessible(column_name)
+      serialize super_serial_column_name.to_sym, OpenStruct
 
       entries.each do |entry|
         handle_entry(entry)
@@ -61,84 +61,35 @@ module SuperSerial #like, for srs
       def define_getter_and_setter(entry)
         class_eval <<-RUBY, __FILE__, __LINE__ +1
                 def #{ entry }
-                  #{ column_name }.#{ entry }
+                  #{ super_serial_column_name }.#{ entry }
                 end
 
                 def #{ entry }=(arg)
-                  #{ column_name }.#{ entry } = arg
+                  #{ super_serial_column_name }.#{ entry } = arg
                 end
         RUBY
       end
   end
 
+  def set_entry_value(value, entry_name)
+    raise Exception.new("#{ entry_name } must be an entry serialized in the #{ self.class.super_serial_column_name } column") unless entry_is_serialized?(entry_name)
+
+    send("#{ entry_name }=", value)
+    send(entry_name) == value
+  end
+
   private
     def set_entry_default(entry)
       entry.each_pair do |entry_name, default_value|
-        set_entry_value(default_value, entry_name)
+        set_entry_value(default_value, entry_name) if entry_is_serialized?(entry_name)
       end
     end
 
     def check_serialized_data_type(entry)
-      entry.each_pair do |entry_name, default_value|
-        validate_value_type(default_value, entry_name) if default_value.present?
-      end
-      errors.empty?
+      ValueValidator.validate(entry, self) if entry_is_serialized?(entry.keys.first)
     end
 
-    def validate_value_type(default_value, entry_name)
-      default_value_class = get_friendly_default_class(default_value)
-      entry_value = send(entry_name)
-
-      unless value_type_valid?(default_value_class, entry_value, entry_name)
-        errors.add(:base, "#{ entry_name.to_s } can only be stored as a #{ default_value_class.downcase }")
-      end
-    end
-
-    def get_friendly_default_class(default_value)
-      get_friendly_class_name(default_value.class.name)
-    end
-
-    def value_type_valid?(default_value_class, value, entry_name)
-      value_class_name = get_friendly_class_name(value.class.name)
-      value_class_name == default_value_class || value_can_be_converted?(default_value_class, value, entry_name)
-    end
-
-    def value_can_be_converted?(default_value_class, value, entry_name)
-      symbolized_default_class = default_value_class.downcase.to_sym
-      converted_value          = cast_value_to_default(value, symbolized_default_class)
-      try_conversion(converted_value, entry_name)
-    end
-
-    CONVERSIONS = {
-        fixnum: :to_i,
-        float: :to_f
-    }
-
-    def cast_value_to_default(value, default_class_type)
-      if default_class_type == :boolean
-        cast_to_boolean(value)
-      else
-        return unless CONVERSIONS.has_key?(default_class_type)
-        value.try(CONVERSIONS[default_class_type])
-      end
-    end
-
-    TRUE_VALUES = [true, 1, '1', 'true', 'TRUE']
-
-    def cast_to_boolean(entry_value)
-      entry_value.in?(TRUE_VALUES)
-    end
-
-    def try_conversion(converted_value, entry_name)
-      converted_value.nil? ? false : set_entry_value(converted_value, entry_name)
-    end
-
-    def set_entry_value(value, entry_name)
-      send("#{ entry_name }=", value)
-      send(entry_name) == value
-    end
-
-    def get_friendly_class_name(class_name)
-      class_name.in?(%w[TrueClass FalseClass]) ? 'Boolean' : class_name
+    def entry_is_serialized?(entry_name)
+      entry_name.in?(self.class.serialized_entry_names)
     end
 end
