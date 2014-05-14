@@ -2,15 +2,17 @@ module SuperSerial #like, for srs
   module ClassMethods
     attr_accessor :super_serial_column_name, :serialized_entry_names
 
-    # Use this method if you need a more robust serialized column. The first argument is the column to store
-    # the serialized data in. From the hash argument, it will define getters and setters for each symbol
-    # or key from the with_defaults hash you pass to it. It handles adding each entry to attr_accessible, which
-    # means you will be able to access values from your serialized column like any other ActiveRecord attr_accessible.
+    # Use this method if you need a more robust serialized column. The first argument denotes the column to store
+    # the serialized data in. From the remaining hash argument, it will define getters and setters using
+    # the given key-value pairs to assign default values to named entries. Each entry is added to attr_accessible.
     #
     # +defaults+
     #
     # This method will set default return values for any entries defined. If the default is a boolean value, it will
-    # define a getter instance method ending in ?. Note that once a default is set, the type cannot be changed.
+    # define a getter instance method ending in ?. It infers the default value's type and validates values against that type.
+    # It has built-in ActiveRecord-style automatic type conversions for convertible values. Note that once a default is set,
+    # any change to its type will need to be accompanied by a migration to change any stored data to the correct type.
+    #
     #
     # +usage+
     #
