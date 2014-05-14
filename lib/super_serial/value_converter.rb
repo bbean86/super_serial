@@ -15,7 +15,7 @@ module SuperSerial
         def cast_value(value, conversion_class)
           if conversion_class == :boolean
             cast_to_boolean(value)
-          elsif !!value.try(:match, /^[[:digit:]]/)
+          elsif !!value.try(:match, /^[[:digit:]]/) || value == ''
             value.try(CONVERSIONS[conversion_class])
           end
         end
