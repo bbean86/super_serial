@@ -19,9 +19,9 @@ module SuperSerial #like, for srs
     #   super_serialize :super_column, entry_1: 'SOME DEFAULT VALUE', entry_2: nil, entry_3: true
     # end
 
-    def super_serialize(_column_name, *entries)
+    def super_serialize(_column_name, entries)
       self.super_serial_column_name = _column_name.to_s
-      self.serialized_entry_names   = entries.map { |entry| entry.keys }.flatten
+      self.serialized_entry_names   = entries.keys
       # raise Exception.new("#{ self.name } does not have a #{ column_name } column") unless self.column_names.include?(column_name)
 
       # please remove the line below and uncomment the exception above once the VenueSettings migration has been run
@@ -29,8 +29,8 @@ module SuperSerial #like, for srs
 
       serialize super_serial_column_name.to_sym, OpenStruct
 
-      entries.each do |entry|
-        handle_entry(entry)
+      entries.each_pair do |entry_name, default_value|
+        handle_entry({"#{entry_name}" => default_value})
       end
     end
 
@@ -89,6 +89,6 @@ module SuperSerial #like, for srs
     end
 
     def entry_is_serialized?(entry_name)
-      entry_name.in?(self.class.serialized_entry_names)
+      entry_name.to_sym.in?(self.class.serialized_entry_names)
     end
 end
