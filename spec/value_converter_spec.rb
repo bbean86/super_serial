@@ -23,12 +23,22 @@ describe SuperSerial::ValueConverter do
       @conversion_method.should_receive(:call).with(0).and_return(true)
       SuperSerial::ValueConverter.convertible?('', :fixnum, @conversion_method).should eql(true)
     end
+
+    it 'converts nil to 0' do
+      @conversion_method.should_receive(:call).with(0).and_return(true)
+      SuperSerial::ValueConverter.convertible?(nil, :fixnum, @conversion_method).should eql(true)
+    end
   end
 
   context 'float conversions' do
     it 'converts an empty string into 0.0' do
       @conversion_method.should_receive(:call).with(0.0).and_return(true)
       SuperSerial::ValueConverter.convertible?('', :float, @conversion_method).should eql(true)
+    end
+
+    it 'converts nil to 0.0' do
+      @conversion_method.should_receive(:call).with(0.0).and_return(true)
+      SuperSerial::ValueConverter.convertible?(nil, :float, @conversion_method).should eql(true)
     end
   end
 
@@ -49,7 +59,8 @@ describe SuperSerial::ValueConverter do
     end
 
     it 'converts anything else to false' do
-      @conversion_method.should_receive(:call).exactly(4).times.with(false).and_return(true)
+      @conversion_method.should_receive(:call).exactly(5).times.with(false).and_return(true)
+      SuperSerial::ValueConverter.convertible?(nil, :boolean, @conversion_method).should eql(true)
       SuperSerial::ValueConverter.convertible?('OMGHAX', :boolean, @conversion_method).should eql(true)
       SuperSerial::ValueConverter.convertible?(1000, :boolean, @conversion_method).should eql(true)
       SuperSerial::ValueConverter.convertible?(2.0, :boolean, @conversion_method).should eql(true)
