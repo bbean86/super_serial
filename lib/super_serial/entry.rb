@@ -8,18 +8,18 @@ module SuperSerial
       self.klass       = klass
       self.column_name = column_name
 
-      handle_entry
-    end
-
-    def handle_entry
-      define_getter_and_setter
-      klass.attr_accessible name
-      define_boolean_accessor if !!value == value
-      set_callbacks
+      handle
     end
 
     private
       attr_accessor :klass, :column_name
+
+      def handle
+        define_getter_and_setter
+        klass.attr_accessible name
+        define_boolean_accessor if !!value == value
+        set_callbacks
+      end
 
       def define_getter_and_setter
         klass.class_eval <<-RUBY, __FILE__, __LINE__ +1
