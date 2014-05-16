@@ -2,8 +2,8 @@ module SuperSerial
   class ValueTypeValidator
     class << self
       def validate(entry, instance)
-        entry_name    = entry.keys.first
-        default_value = entry.values.first
+        entry_name    = entry.name
+        default_value = entry.value
 
         return true if default_value.nil?
 

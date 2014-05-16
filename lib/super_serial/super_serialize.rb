@@ -32,44 +32,9 @@ module SuperSerial #like, for srs
       serialize super_serial_column_name.to_sym, OpenStruct
 
       entries.each_pair do |entry_name, default_value|
-        handle_entry({"#{entry_name}" => default_value})
+        Entry.new(entry_name, default_value, self, super_serial_column_name)
       end
     end
-
-    private
-      def handle_entry(entry)
-        entry.each_pair do |entry_name, default_value|
-          define_getter_and_setter(entry_name)
-          attr_accessible(entry_name)
-          define_boolean_accessor(entry_name) if !!default_value == default_value # is a boolean
-        end
-        set_callbacks(entry)
-      end
-
-      def define_boolean_accessor(entry_name)
-        class_eval <<-RUBY, __FILE__, __LINE__ +1
-              def #{ entry_name }?
-                #{ entry_name }
-              end
-        RUBY
-      end
-
-      def set_callbacks(entry)
-        self.send(:before_validation, proc { set_entry_default(entry) }, { on: :create })
-        self.send(:before_validation, proc { check_serialized_data_type(entry) })
-      end
-
-      def define_getter_and_setter(entry)
-        class_eval <<-RUBY, __FILE__, __LINE__ +1
-                def #{ entry }
-                  #{ super_serial_column_name }.#{ entry }
-                end
-
-                def #{ entry }=(arg)
-                  #{ super_serial_column_name }.#{ entry } = arg
-                end
-        RUBY
-      end
   end
 
   def set_entry_value(value, entry_name)
@@ -80,17 +45,8 @@ module SuperSerial #like, for srs
   end
 
   private
-    def set_entry_default(entry)
-      entry.each_pair do |entry_name, default_value|
-        set_entry_value(default_value, entry_name) if entry_is_serialized?(entry_name)
-      end
-    end
 
-    def check_serialized_data_type(entry)
-      ValueTypeValidator.validate(entry, self) if entry_is_serialized?(entry.keys.first)
-    end
-
-    def entry_is_serialized?(entry_name)
-      entry_name.to_sym.in?(self.class.serialized_entry_names)
-    end
+  def entry_is_serialized?(entry_name)
+    entry_name.to_sym.in?(self.class.serialized_entry_names)
+  end
 end
