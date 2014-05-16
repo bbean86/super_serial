@@ -1,9 +1,9 @@
 module SuperSerial
   class ValueConverter
     class << self
-      def convertible?(value, conversion_class, conversion_method)
+      def convertible?(value, conversion_class, value_setter)
         converted_value = cast_value(value, conversion_class)
-        try_conversion(converted_value, conversion_method)
+        try_conversion(converted_value, value_setter)
       end
 
       private
@@ -28,8 +28,8 @@ module SuperSerial
           entry_value.in?(TRUE_VALUES)
         end
 
-        def try_conversion(converted_value, conversion_method)
-          converted_value.nil? ? false : conversion_method.call(converted_value)
+        def try_conversion(converted_value, value_setter)
+          converted_value.nil? ? false : value_setter.call(converted_value)
         end
     end
   end
