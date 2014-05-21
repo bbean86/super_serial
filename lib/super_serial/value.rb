@@ -1,10 +1,10 @@
 module SuperSerial
   class Value
-    def initialize(name, default_value, klass_instance)
-      @name                     = name
+    def initialize(entry_name, default_value, klass_instance)
+      @entry_name               = entry_name
       @default_value            = default_value
       @default_value_class_name = get_friendly_class_name(default_value.class.name)
-      @current_value            = klass_instance.send(name)
+      @current_value            = klass_instance.send(entry_name)
       @current_value_class_name = get_friendly_class_name(current_value.class.name)
       @klass_instance           = klass_instance
     end
@@ -13,7 +13,7 @@ module SuperSerial
       return true if default_value.nil?
 
       unless valid_or_castable?
-        klass_instance.errors.add(:base, "#{ name.to_s } can only be stored as a #{ default_value_class_name.downcase }")
+        klass_instance.errors.add(:base, "#{ entry_name } can only be stored as a #{ default_value_class_name }")
       end
 
       klass_instance.errors.empty?
@@ -21,7 +21,7 @@ module SuperSerial
 
     private
 
-      attr_reader :name,
+      attr_reader :entry_name,
                   :default_value,
                   :klass_instance,
                   :default_value_class_name,
@@ -37,7 +37,7 @@ module SuperSerial
       end
 
       def castable?
-        cast_value.nil? ? false : klass_instance.set_super_serial_value(cast_value, name)
+        cast_value.nil? ? false : klass_instance.set_super_serial_value(cast_value, entry_name)
       end
 
       TRUE_VALUES = [true, 1, '1', 'true', 'TRUE']

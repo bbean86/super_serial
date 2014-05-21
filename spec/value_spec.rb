@@ -24,6 +24,7 @@ describe SuperSerial::Value do
   it 'does not allow a value of a different type to be stored' do
     @instance.int_entry = 'This is not an integer'
     SuperSerial::Value.new('int_entry', @default_int, @instance).cast_and_validate.should eql(false)
+    @instance.errors.full_messages.first.should eql('int_entry can only be stored as a fixnum')
   end
 
   it 'allows boolean values to be changed' do
