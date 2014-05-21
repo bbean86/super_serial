@@ -8,13 +8,13 @@ module SuperSerial
       self.klass       = klass
       self.column_name = column_name
 
-      handle
+      generate
     end
 
     private
       attr_accessor :klass, :column_name
 
-      def handle
+      def generate
         define_getter_and_setter
         klass.attr_accessible name
         define_boolean_accessor if !!value == value
