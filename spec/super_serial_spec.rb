@@ -44,18 +44,18 @@ describe SuperSerial do
     end
   end
 
-  context '#set_entry_value' do
+  context '#set_super_serial_value' do
     before :each do
       ClassToSuperSerialize.super_serialize :foo_column, name: 'Billy', male: true, height: 70, bar_attribute: nil
       @instance = ClassToSuperSerialize.create
     end
 
     it 'returns a boolean' do
-      @instance.set_entry_value('Nick Fury', :name).should eql(true)
+      @instance.set_super_serial_value('Nick Fury', :name).should eql(true)
     end
 
     it 'sets the entry to the value given' do
-      @instance.set_entry_value('Bruce Banner', :name)
+      @instance.set_super_serial_value('Bruce Banner', :name)
       @instance.name.should eql('Bruce Banner')
     end
   end

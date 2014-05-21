@@ -37,7 +37,7 @@ module SuperSerial
       end
 
       def castable?
-        cast_value.nil? ? false : klass_instance.set_entry_value(cast_value, name)
+        cast_value.nil? ? false : klass_instance.set_super_serial_value(cast_value, name)
       end
 
       TRUE_VALUES = [true, 1, '1', 'true', 'TRUE']

@@ -37,7 +37,7 @@ module SuperSerial #like, for srs
     end
   end
 
-  def set_entry_value(value, entry_name)
+  def set_super_serial_value(value, entry_name)
     raise Exception.new("#{ entry_name } must be an entry serialized in the #{ self.class.super_serial_column_name } column") unless entry_is_serialized?(entry_name)
 
     send("#{ entry_name }=", value)
