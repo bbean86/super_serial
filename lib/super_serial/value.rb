@@ -1,58 +1,56 @@
 module SuperSerial
   class Value
-    class << self
-      def validate(entry_name, entry_default_value, instance)
-        return true if entry_default_value.nil?
+    def initialize(name, default_value, klass_instance)
+      @name                     = name
+      @default_value            = default_value
+      @default_value_class_name = get_friendly_class_name(default_value.class.name)
+      @current_value            = klass_instance.send(name)
+      @current_value_class_name = get_friendly_class_name(current_value.class.name)
+      @klass_instance           = klass_instance
+    end
 
-        default_value_class = get_friendly_class_name(entry_default_value.class.name)
-        value_setter        = ->(converted_value) { instance.set_entry_value(converted_value, entry_name) }
+    def cast_and_validate
+      return true if default_value.nil?
 
-        unless value_type_valid?(default_value_class, instance.send(entry_name), value_setter)
-          instance.errors.add(:base, "#{ entry_name.to_s } can only be stored as a #{ default_value_class.downcase }")
-        end
-
-        instance.errors.empty?
+      unless valid_or_castable?
+        klass_instance.errors.add(:base, "#{ name.to_s } can only be stored as a #{ default_value_class_name.downcase }")
       end
 
-      private
-        def value_type_valid?(default_value_class, value, value_setter)
-          get_friendly_class_name(value.class.name) == default_value_class || convertible?(value, default_value_class.downcase.to_sym, value_setter)
-        end
-
-        def convertible?(value, conversion_class, value_setter)
-          converted_value = cast_value(value, conversion_class)
-          try_conversion(converted_value, value_setter)
-        end
-
-        private
-        CONVERSIONS = {
-            fixnum: :to_i,
-            float: :to_f
-        }
-
-        def cast_value(value, conversion_class)
-          if conversion_class == :boolean
-            cast_to_boolean(value)
-          elsif !!value.try(:match, /^[[:digit:]]/) || value == ''
-            value.try(CONVERSIONS[conversion_class])
-          elsif value.nil?
-            value.send(CONVERSIONS[conversion_class])
-          end
-        end
-
-        TRUE_VALUES = [true, 1, '1', 'true', 'TRUE']
-
-        def cast_to_boolean(entry_value)
-          entry_value.in?(TRUE_VALUES)
-        end
-
-        def try_conversion(converted_value, value_setter)
-          converted_value.nil? ? false : value_setter.call(converted_value)
-        end
-
-        def get_friendly_class_name(class_name)
-          class_name.in?(%w[TrueClass FalseClass]) ? 'Boolean' : class_name
-        end
+      klass_instance.errors.empty?
     end
+
+    private
+
+      attr_reader :name,
+                  :default_value,
+                  :klass_instance,
+                  :default_value_class_name,
+                  :current_value,
+                  :current_value_class_name
+
+      def valid_or_castable?
+        current_value_class_name == default_value_class_name || castable?
+      end
+
+      def get_friendly_class_name(class_name)
+        class_name.in?(%w[TrueClass FalseClass]) ? :boolean : class_name.downcase.to_sym
+      end
+
+      def castable?
+        cast_value.nil? ? false : klass_instance.set_entry_value(cast_value, name)
+      end
+
+      TRUE_VALUES = [true, 1, '1', 'true', 'TRUE']
+      CONVERSIONS = { fixnum: :to_i, float: :to_f }
+
+      def cast_value
+        if default_value_class_name == :boolean
+          current_value.in?(TRUE_VALUES)
+        elsif !!current_value.try(:match, /^[[:digit:]]/) || current_value == ''
+          current_value.try(CONVERSIONS[default_value_class_name])
+        elsif current_value.nil?
+          current_value.send(CONVERSIONS[default_value_class_name])
+        end
+      end
   end
 end
