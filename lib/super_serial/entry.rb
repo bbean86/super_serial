@@ -46,7 +46,7 @@ module SuperSerial
         _name  = name
         _value = value
         klass.send(:before_validation, proc { set_entry_value(_value, _name) if entry_is_serialized?(_name) }, { on: :create })
-        klass.send(:before_validation, proc { ValueTypeValidator.validate(_name, _value, self) if entry_is_serialized?(_name) })
+        klass.send(:before_validation, proc { Value.validate(_name, _value, self) if entry_is_serialized?(_name) })
       end
   end
 end
