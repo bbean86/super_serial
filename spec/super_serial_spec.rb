@@ -9,6 +9,12 @@ describe SuperSerial do
     }.to raise_exception(Exception)
   end
 
+  it "raises an exception if the given column name does not exist in the class's column_names list" do
+    expect {
+      ClassToSuperSerialize.super_serialize :does_not_exist, foo: 'bar'
+    }.to raise_exception(Exception)
+  end
+
   it 'handles updates to the invocation of .super_serialize' do
     ClassToSuperSerialize.super_serialize :foo_column, foo_attribute: 'DEFAULT'
     expect { ClassToSuperSerialize.create }.not_to raise_exception(Exception)
