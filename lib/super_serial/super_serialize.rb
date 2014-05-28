@@ -26,8 +26,6 @@ module SuperSerial #like, for srs
       self.serialized_entry_names   = entries.keys
       raise Exception.new("#{ self.name } does not have a #{ super_serial_column_name } column") unless self.column_names.include?(super_serial_column_name)
 
-      return unless self.column_names.include?(super_serial_column_name)
-
       serialize super_serial_column_name.to_sym, OpenStruct
 
       entries.each_pair do |entry_name, default_value|
