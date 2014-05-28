@@ -24,9 +24,8 @@ module SuperSerial #like, for srs
     def super_serialize(_column_name, entries)
       self.super_serial_column_name = _column_name.to_s
       self.serialized_entry_names   = entries.keys
-      # raise Exception.new("#{ self.name } does not have a #{ column_name } column") unless self.column_names.include?(column_name)
+      raise Exception.new("#{ self.name } does not have a #{ super_serial_column_name } column") unless self.column_names.include?(super_serial_column_name)
 
-      # please remove the line below and uncomment the exception above once the VenueSettings migration has been run
       return unless self.column_names.include?(super_serial_column_name)
 
       serialize super_serial_column_name.to_sym, OpenStruct
