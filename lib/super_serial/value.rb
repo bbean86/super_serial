@@ -29,14 +29,14 @@ module SuperSerial
                   :current_value_class_name
 
       def valid_or_castable?
-        current_value_class_name == default_value_class_name || castable?
+        current_value_class_name == default_value_class_name || casted?
       end
 
       def get_friendly_class_name(class_name)
         class_name.in?(%w[TrueClass FalseClass]) ? :boolean : class_name.downcase.to_sym
       end
 
-      def castable?
+      def casted?
         cast_value.nil? ? false : klass_instance.set_super_serial_value(cast_value, entry_name)
       end
 
