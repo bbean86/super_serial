@@ -12,7 +12,7 @@ module SuperSerial
     def cast_and_validate
       return true if default_value.nil?
 
-      unless valid_or_castable?
+      unless valid_or_casted?
         klass_instance.errors.add(:base, "#{ entry_name } can only be stored as a #{ default_value_class_name }")
       end
 
@@ -28,7 +28,7 @@ module SuperSerial
                   :current_value,
                   :current_value_class_name
 
-      def valid_or_castable?
+      def valid_or_casted?
         current_value_class_name == default_value_class_name || casted?
       end
 
@@ -37,20 +37,25 @@ module SuperSerial
       end
 
       def casted?
-        cast_value.nil? ? false : klass_instance.set_super_serial_value(cast_value, entry_name)
+        casted_value = get_casted_value
+        casted_value.nil? ? false : klass_instance.set_super_serial_value(casted_value, entry_name)
       end
 
       TRUE_VALUES = [true, 1, '1', 'true', 'TRUE']
       CONVERSIONS = { fixnum: :to_i, float: :to_f }
 
-      def cast_value
+      def get_casted_value
         if default_value_class_name == :boolean
           current_value.in?(TRUE_VALUES)
-        elsif !!current_value.try(:match, /^[[:digit:]]/) || current_value == ''
+        elsif value_numeric_or_empty?
           current_value.try(CONVERSIONS[default_value_class_name])
         elsif current_value.nil?
           current_value.send(CONVERSIONS[default_value_class_name])
         end
+      end
+
+      def value_numeric_or_empty?
+        !!current_value.try(:match, /^[[:digit:]]/) || current_value == ''
       end
   end
 end
