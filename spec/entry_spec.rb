@@ -9,6 +9,7 @@ describe SuperSerial::Entry do
         t.text :foo_column
       end
     end
+    EntryTest.super_serialize :foo_column, name: 'Baz'
   end
   
   before :each do

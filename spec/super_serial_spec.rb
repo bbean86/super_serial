@@ -32,14 +32,13 @@ describe SuperSerial do
       before :each do
         ClassToSuperSerialize.super_serialize :foo_column, name: 'Billy', male: true, height: 70, bar_attribute: nil
       end
+
       context 'an instance of the class calling .super_serialize' do
         before :each do
           @instance = ClassToSuperSerialize.new
         end
+
         context 'that is a new record' do
-          before :each do
-            @instance.save!
-          end
           it 'sets the default values for the entries given' do
             { name: 'Billy', male: true, height: 70 }.each_pair do |entry_name, default_value|
               @instance.send(entry_name).should eql(default_value)

@@ -42,11 +42,16 @@ module SuperSerial
       end
 
       def set_callbacks
-        #store in temps for correct context at proc runtime
-        _name  = name
-        _value = value
-        klass.send(:before_validation, proc { set_super_serial_value(_value, _name) if entry_is_serialized?(_name) }, { on: :create })
-        klass.send(:before_validation, proc { Value.new(_name, _value, self).cast_and_validate if entry_is_serialized?(_name) })
+        klass.send(:after_initialize, set_default_value_lambda(name, value))
+        klass.send(:before_validation, validate_value_lambda(name, value))
+      end
+
+      def validate_value_lambda(_name, _value)
+        ->{ Value.new(_name, _value, self).cast_and_validate if entry_is_serialized?(_name) }
+      end
+
+      def set_default_value_lambda(_name, _value)
+        ->{ set_super_serial_value(_value, _name) if entry_is_serialized?(_name) and new_record? }
       end
   end
 end
