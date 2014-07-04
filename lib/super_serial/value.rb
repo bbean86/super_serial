@@ -49,8 +49,10 @@ module SuperSerial
           current_value.in?(TRUE_VALUES)
         elsif value_numeric_or_empty?
           current_value.try(CONVERSIONS[default_value_class_name])
-        elsif current_value.nil?
+        elsif current_value.nil? and default_value_class_name.in?([:fixnum, :float])
           current_value.send(CONVERSIONS[default_value_class_name])
+        elsif default_value_class_name == :string
+          current_value || ''
         end
       end
 

@@ -39,6 +39,11 @@ describe SuperSerial::Value do
     @instance.errors.full_messages.size.should eql(1)
   end
 
+  it 'can cast nil to an empty string' do
+    @instance.string_entry = nil
+    SuperSerial::Value.new('string_entry', @default_string, @instance).cast_and_validate.should eql(true)
+  end
+
   it 'does not validate nil default values' do
     @instance.nil_entry = 'I can set this to anything'
     SuperSerial::Value.new('nil_entry', nil, @instance).cast_and_validate.should eql(true)
