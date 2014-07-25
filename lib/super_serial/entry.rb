@@ -51,7 +51,7 @@ module SuperSerial
       end
 
       def set_default_value_lambda(_name, _value)
-        ->{ set_super_serial_value(_value, _name) if entry_is_serialized?(_name) and new_record? }
+        ->{ set_super_serial_value(_value, _name) if entry_is_serialized?(_name) and entry_needs_default?(_name) }
       end
   end
 end
