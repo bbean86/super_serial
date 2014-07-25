@@ -1,6 +1,14 @@
 require 'spec_helper'
 
 describe SuperSerial do
+  around(:each) do
+    ActiveRecord::Base.connection.close
+  end
+
+  after(:each) do
+    Object.send(:remove_const, :ClassToSuperSerialize)
+  end
+
   it 'cannot be included in non AR classes' do
     expect {
       class NonActiveRecord
@@ -20,6 +28,29 @@ describe SuperSerial do
     expect { ClassToSuperSerialize.create }.not_to raise_exception(Exception)
     ClassToSuperSerialize.super_serialize :foo_column, bar_attribute: true
     expect { ClassToSuperSerialize.create }.not_to raise_exception(Exception)
+  end
+
+  it 'handles updates to the invocation of .super_serialize for persisted objects that have super serial added to them' do
+    ClassToSuperSerialize.create
+    ClassToSuperSerialize.super_serialize :foo_column, foo_attribute: 'DEFAULT'
+    ClassToSuperSerialize.new.foo_attribute.should eql('DEFAULT')
+    ClassToSuperSerialize.super_serialize :foo_column, bar_attribute: false
+    ClassToSuperSerialize.new.bar_attribute.should eql(false)
+  end
+
+  it 'handles updates to the invocation of .super_serialize for persisted objects' do
+    ClassToSuperSerialize.super_serialize :foo_column, foo_attribute: 'DEFAULT'
+    ClassToSuperSerialize.create
+    ClassToSuperSerialize.new.foo_attribute.should eql('DEFAULT')
+    ClassToSuperSerialize.super_serialize :foo_column, bar_attribute: false
+    ClassToSuperSerialize.new.bar_attribute.should eql(false)
+  end
+
+  it 'handles updates to the invocation of .super_serialize for persisted objects' do
+    ClassToSuperSerialize.super_serialize :foo_column, foo_attribute: 'DEFAULT'
+    ClassToSuperSerialize.new.foo_attribute.should eql('DEFAULT')
+    ClassToSuperSerialize.super_serialize :foo_column, bar_attribute: false
+    ClassToSuperSerialize.new.bar_attribute.should eql(false)
   end
 
   context '.super_serialize' do

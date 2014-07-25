@@ -1,3 +1,6 @@
+v2.1.6
+Fixed an issue assigning defaults to already persisted classes, and fixed main spec
+
 v2.1.5
 Fixed issue with casting nil to a string
 

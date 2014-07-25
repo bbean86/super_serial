@@ -46,4 +46,8 @@ module SuperSerial #like, for srs
   def entry_is_serialized?(entry_name)
     entry_name.to_sym.in?(self.class.serialized_entry_names)
   end
+
+  def entry_needs_default?(_name)
+    send(self.class.super_serial_column_name).send(_name).nil?
+  end
 end
