@@ -44,7 +44,7 @@ module SuperSerial #like, for srs
   private
 
   def entry_is_serialized?(entry_name)
-    entry_name.to_sym.in?(self.class.serialized_entry_names)
+    entry_name.to_sym.in?(self.class.serialized_entry_names.to_a)
   end
 
   def entry_needs_default?(_name)
