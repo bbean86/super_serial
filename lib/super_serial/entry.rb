@@ -47,7 +47,7 @@ module SuperSerial
       end
 
       def validate_value_lambda(_name, _value)
-        ->{ Value.new(_name, _value, self).cast_and_validate if entry_is_serialized?(_name) }
+        ->{ SuperSerial::Value.new(_name, _value, self).cast_and_validate if entry_is_serialized?(_name) }
       end
 
       def set_default_value_lambda(_name, _value)

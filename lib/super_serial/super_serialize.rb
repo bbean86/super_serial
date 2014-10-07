@@ -24,18 +24,19 @@ module SuperSerial #like, for srs
     def super_serialize(_column_name, entries)
       self.super_serial_column_name = _column_name.to_s
       self.serialized_entry_names   = entries.keys
-      raise Exception.new("#{ self.name } does not have a #{ super_serial_column_name } column") unless self.column_names.include?(super_serial_column_name)
 
       serialize super_serial_column_name.to_sym, OpenStruct
 
       entries.each_pair do |entry_name, default_value|
-        Entry.new(entry_name, default_value, self, super_serial_column_name)
+        SuperSerial::Entry.new(entry_name, default_value, self, super_serial_column_name)
       end
     end
   end
 
   def set_super_serial_value(value, entry_name)
-    raise Exception.new("#{ entry_name } must be an entry serialized in the #{ self.class.super_serial_column_name } column") unless entry_is_serialized?(entry_name)
+    unless entry_is_serialized?(entry_name)
+      raise "#{ entry_name } must be an entry serialized in the #{ self.class.super_serial_column_name } column"
+    end
 
     send("#{ entry_name }=", value)
     send(entry_name) == value
