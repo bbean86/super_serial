@@ -1,4 +1,5 @@
 require 'spec_helper'
+require 'support/rails_4_model'
 
 describe SuperSerial::Entry do
   before :all do
@@ -23,6 +24,11 @@ describe SuperSerial::Entry do
   context 'on the abstract class' do
     before :each do
       @instance = EntryTest.new
+    end
+
+    it 'does not exception without attr_accessible defined' do
+      class FooClass < Rails4Model; end
+      expect(->{ SuperSerial::Entry.new('name', 'Ben', FooClass, :foo_column) }).not_to raise_error
     end
 
     it 'defines a getter and setter' do
