@@ -25,7 +25,7 @@ module SuperSerial #like, for srs
       self.super_serial_column_name = _column_name.to_s
       self.serialized_entry_names   = entries.keys
 
-      serialize super_serial_column_name.to_sym, OpenStruct
+      serialize super_serial_column_name.to_sym, DataStruct
 
       entries.each_pair do |entry_name, default_value|
         SuperSerial::Entry.new(entry_name, default_value, self, super_serial_column_name)

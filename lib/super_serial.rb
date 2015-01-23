@@ -4,6 +4,7 @@ require "super_serial/version"
 require 'super_serial/super_serialize'
 require 'super_serial/value'
 require 'super_serial/entry'
+require 'super_serial/data_struct'
 
 module SuperSerial
   extend ActiveSupport::Concern

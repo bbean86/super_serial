@@ -49,7 +49,7 @@ describe SuperSerial do
 
   context '.super_serialize' do
     it 'serializes the data given in the column given by the first argument' do
-      ClassToSuperSerialize.should_receive(:serialize).with(:foo_column, OpenStruct)
+      ClassToSuperSerialize.should_receive(:serialize).with(:foo_column, DataStruct)
       ClassToSuperSerialize.super_serialize :foo_column, name: 'Billy'
     end
 
