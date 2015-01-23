@@ -16,7 +16,7 @@ module SuperSerial
 
       def generate
         define_getter_and_setter
-        klass.attr_accessible name
+        klass.attr_accessible name if klass.respond_to?(:attr_accessible)
         define_boolean_accessor if !!value == value
         set_callbacks
       end
