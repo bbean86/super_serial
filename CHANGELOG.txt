@@ -1,3 +1,6 @@
+v2.2.0
+Add handling for classes that do not define .attr_accessible, and change the serialized column's response to #to_json
+
 v2.1.8
 Remove exception requiring column on class, it was too strict
 
